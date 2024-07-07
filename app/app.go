@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gadhittana-01/form-go/handler"
-	"github.com/gadhittana-01/form-go/utils"
+	"github.com/gadhittana-01/queue-go/handler"
+	"github.com/gadhittana-01/queue-go/utils"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 )
@@ -15,19 +15,22 @@ type App interface {
 }
 
 type AppImpl struct {
-	route       *chi.Mux
-	config      *utils.BaseConfig
-	userHandler handler.UserHandler
+	route        *chi.Mux
+	config       *utils.BaseConfig
+	userHandler  handler.UserHandler
+	queueHandler handler.QueueHandler
 }
 
 func NewApp(route *chi.Mux,
 	config *utils.BaseConfig,
 	userHandler handler.UserHandler,
+	queueHandler handler.QueueHandler,
 ) App {
 	return &AppImpl{
-		route:       route,
-		config:      config,
-		userHandler: userHandler,
+		route:        route,
+		config:       config,
+		userHandler:  userHandler,
+		queueHandler: queueHandler,
 	}
 }
 
@@ -37,7 +40,10 @@ func (s *AppImpl) Start() {
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 	}))
+
 	s.userHandler.SetupUserRoutes(s.route)
+	s.queueHandler.SetupQueueRoutes(s.route)
+
 	s.route.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		utils.GenerateErrorResp[any](w, nil, 404)
 	})

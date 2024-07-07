@@ -4,6 +4,7 @@ sql:
     - "./db/migration/"
   queries:
     - "./db/queries/users.sql"
+    - "./db/queries/queue.sql"
     
   engine: "postgresql"
   gen:

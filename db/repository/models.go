@@ -5,17 +5,29 @@
 package querier
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Queue struct {
+	ID               uuid.UUID       `json:"id"`
+	QueueNumber      string          `json:"queue_number"`
+	UserID           uuid.UUID       `json:"user_id"`
+	ArrivalTime      time.Time       `json:"arrival_time"`
+	ServiceTime      sql.NullTime    `json:"service_time"`
+	TotalWaitingTime pgtype.Interval `json:"total_waiting_time"`
+	CreatedAt        time.Time       `json:"created_at"`
+	UpdatedAt        time.Time       `json:"updated_at"`
+}
+
 type User struct {
-	ID             uuid.UUID `json:"id"`
-	Name           string    `json:"name"`
-	IdentityNumber string    `json:"identity_number"`
-	Email          string    `json:"email"`
-	DateOfBirth    time.Time `json:"date_of_birth"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

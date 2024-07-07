@@ -1,7 +1,7 @@
 package querier
 
 import (
-	"github.com/gadhittana-01/form-go/utils"
+	"github.com/gadhittana-01/queue-go/utils"
 	"github.com/jackc/pgx/v5"
 )
 

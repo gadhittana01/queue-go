@@ -1,14 +1,18 @@
 package utils
 
 import (
+	"time"
+
 	"github.com/spf13/viper"
 )
 
 type BaseConfig struct {
-	ServerPort   int    `mapstructure:"SERVER_PORT"`
-	DBConnString string `mapstructure:"DB_CONN_STRING"`
-	DBName       string `mapstructure:"DB_NAME"`
-	MigrationURL string `mapstructure:"MIGRATION_URL"`
+	ServerPort          int           `mapstructure:"SERVER_PORT"`
+	DBConnString        string        `mapstructure:"DB_CONN_STRING"`
+	DBName              string        `mapstructure:"DB_NAME"`
+	MigrationURL        string        `mapstructure:"MIGRATION_URL"`
+	JWTKey              string        `mapstructure:"JWT_KEY"`
+	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 }
 
 func LoadBaseConfig(path string, configName string, config *BaseConfig) {

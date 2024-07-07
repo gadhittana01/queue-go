@@ -7,11 +7,11 @@
 package main
 
 import (
-	"github.com/gadhittana-01/form-go/app"
-	"github.com/gadhittana-01/form-go/db/repository"
-	"github.com/gadhittana-01/form-go/handler"
-	"github.com/gadhittana-01/form-go/service"
-	"github.com/gadhittana-01/form-go/utils"
+	"github.com/gadhittana-01/queue-go/app"
+	"github.com/gadhittana-01/queue-go/db/repository"
+	"github.com/gadhittana-01/queue-go/handler"
+	"github.com/gadhittana-01/queue-go/service"
+	"github.com/gadhittana-01/queue-go/utils"
 	"github.com/go-chi/chi"
 	"github.com/google/wire"
 )
@@ -20,12 +20,20 @@ import (
 
 func InitializeApp(route *chi.Mux, DB utils.PGXPool, config *utils.BaseConfig) (app.App, error) {
 	repository := querier.NewRepository(DB)
-	userSvc := service.NewUserSvc(repository, config)
+	tokenClient := utils.NewToken(config)
+	userSvc := service.NewUserSvc(repository, config, tokenClient)
 	userHandler := handler.NewUserHandler(userSvc)
-	appApp := app.NewApp(route, config, userHandler)
+	queueSvc := service.NewQueueSvc(repository, config)
+	authMiddleware := utils.NewAuthMiddleware(config, tokenClient)
+	queueHandler := handler.NewQueueHandler(queueSvc, authMiddleware)
+	appApp := app.NewApp(route, config, userHandler, queueHandler)
 	return appApp, nil
 }
 
 // injector.go:
 
-var userHandlerSet = wire.NewSet(querier.NewRepository, handler.NewUserHandler, service.NewUserSvc)
+var userHandlerSet = wire.NewSet(querier.NewRepository, utils.NewToken, handler.NewUserHandler, service.NewUserSvc)
+
+var queueHandlerSet = wire.NewSet(handler.NewQueueHandler, service.NewQueueSvc)
+
+var authMiddlewareSet = wire.NewSet(utils.NewAuthMiddleware)

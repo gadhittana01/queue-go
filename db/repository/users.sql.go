@@ -7,35 +7,69 @@ package querier
 
 import (
 	"context"
-	"time"
+
+	"github.com/google/uuid"
 )
 
+const checkEmailExists = `-- name: CheckEmailExists :one
+SELECT EXISTS(SELECT id FROM "users" WHERE email=$1)
+`
+
+func (q *Queries) CheckEmailExists(ctx context.Context, email string) (bool, error) {
+	row := q.db.QueryRow(ctx, checkEmailExists, email)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const checkUserExists = `-- name: CheckUserExists :one
+SELECT EXISTS(SELECT id FROM "users" WHERE id=$1)
+`
+
+func (q *Queries) CheckUserExists(ctx context.Context, id uuid.UUID) (bool, error) {
+	row := q.db.QueryRow(ctx, checkUserExists, id)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createUser = `-- name: CreateUser :one
-INSERT INTO "users"(name, identity_number, email, date_of_birth) VALUES
-($1, $2, $3, $4) RETURNING id, name, identity_number, email, date_of_birth, created_at, updated_at
+INSERT INTO "users"(name, email, password) VALUES
+($1, $2, $3) RETURNING id, name, email, password, created_at, updated_at
 `
 
 type CreateUserParams struct {
-	Name           string    `json:"name"`
-	IdentityNumber string    `json:"identity_number"`
-	Email          string    `json:"email"`
-	DateOfBirth    time.Time `json:"date_of_birth"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser,
-		arg.Name,
-		arg.IdentityNumber,
-		arg.Email,
-		arg.DateOfBirth,
-	)
+	row := q.db.QueryRow(ctx, createUser, arg.Name, arg.Email, arg.Password)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.IdentityNumber,
 		&i.Email,
-		&i.DateOfBirth,
+		&i.Password,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const findUserByEmail = `-- name: FindUserByEmail :one
+SELECT id, name, email, password, created_at, updated_at FROM "users" WHERE email=$1
+`
+
+func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRow(ctx, findUserByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Password,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

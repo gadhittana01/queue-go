@@ -1,8 +1,22 @@
 package dto
 
-type CreateUserReq struct {
-	Name           string `json:"name" validate:"required"`
-	IdentityNumber string `json:"identityNumber" validate:"required"`
-	Email          string `json:"email" validate:"required"`
-	DateOfBirth    string `json:"dateOfBirth" validate:"required"`
+import "github.com/google/uuid"
+
+type SignUpReq struct {
+	Name     string `json:"name" validate:"required"`
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+type SignInReq struct {
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+type ProcessQueueReq struct {
+	QueueID uuid.UUID `json:"queueId" validate:"required"`
+}
+
+type DeleteQueueReq struct {
+	QueueID uuid.UUID `json:"queueId" validate:"required"`
 }

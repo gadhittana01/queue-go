@@ -6,10 +6,21 @@ package querier
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
+	CheckEmailExists(ctx context.Context, email string) (bool, error)
+	CheckUserExists(ctx context.Context, id uuid.UUID) (bool, error)
+	CreateQueue(ctx context.Context, arg CreateQueueParams) (Queue, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteQueue(ctx context.Context, arg DeleteQueueParams) error
+	FindLatestQueue(ctx context.Context) (Queue, error)
+	FindQueue(ctx context.Context) ([]Queue, error)
+	FindQueueByID(ctx context.Context, arg FindQueueByIDParams) (Queue, error)
+	FindUserByEmail(ctx context.Context, email string) (User, error)
+	UpdateQueue(ctx context.Context, arg UpdateQueueParams) (Queue, error)
 }
 
 var _ Querier = (*Queries)(nil)

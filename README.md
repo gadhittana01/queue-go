@@ -1,4 +1,4 @@
-# Form BE
+# Queue BE
 
 # Pre-requisite to contribute
 To run the service on your local machine, you must have these components installed on your local machine : 
